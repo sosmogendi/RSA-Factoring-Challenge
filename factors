@@ -1,25 +1,30 @@
 #!/usr/bin/env python3
 
 import sys
-import os
+
 
 def factorize_number(num):
-    for i in range(2, num // 2 + 1):
+    factors = []
+    for i in range(2, num):
         if num % i == 0:
-            return i, num // i
-    return None, None
+            factors.append((i, num // i))
+            break
+    return factors
+
 
 def main(filename):
     with open(filename, 'r') as file:
         for line in file:
-            num = int(line.strip())
-            p, q = factorize_number(num)
-            print(f"{num}={p}*{q}")
+            num = int(line)
+            factors = factorize_number(num)
+            if factors:
+                p, q = factors[0]
+                print(f"{num}={p}*{q}")
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: factors <file>")
         sys.exit(1)
-
     filename = sys.argv[1]
     main(filename)
