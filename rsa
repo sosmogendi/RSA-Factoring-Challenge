@@ -1,42 +1,51 @@
-#!/usr/bin/env python3
-
 import sys
+import random
 
 
-def is_prime(n):
-    if n <= 1:
-        return False
-    for i in range(2, int(n ** 0.5) + 1):
-        if n % i == 0:
-            return False
-    return True
+def factorize_number(num):
+    def pollard_rho(n):
+        def f(x):
+            return (x**2 + 1) % n
 
+        x = random.randint(0, n - 1)
+        y = x
+        d = 1
 
-def factorize_rsa_number(num):
+        while d == 1:
+            x = f(x)
+            y = f(f(y))
+            d = gcd(abs(x - y), n)
+
+        return d
+
+    def gcd(a, b):
+        while b != 0:
+            a, b = b, a % b
+        return a
+
     factors = []
-    for i in range(2, num):
-        if num % i == 0 and is_prime(i) and is_prime(num // i):
-            factors.append((i, num // i))
-            break
+    while num > 1:
+        factor = pollard_rho(num)
+        factors.append(factor)
+        num //= factor
+
     return factors
 
 
 def main(filename):
     with open(filename, 'r') as file:
         for line in file:
-            num = int(line)
-            factors = factorize_rsa_number(num)
-            if factors:
-                p, q = factors[0]
-                print(f"{num}={p}*{q}")
-            else:
-                print(f"No prime factors found for {num}")
+            num = int(line.strip())
+            factors = factorize_number(num)
+            factorization = f"{num}={str('*'.join(map(str, factors)))}"
+            print(factorization)
 
-
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: rsa <file>")
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python factors.py <file>")
+        print("Please provide the file containing the numbers to factorize.")
         sys.exit(1)
+
     filename = sys.argv[1]
     main(filename)
 
